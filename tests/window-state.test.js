@@ -1,0 +1,6 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';
+import {resolveVisualizerState} from '../desktop/window-state.cjs';
+const main={id:1,workArea:{x:0,y:0,width:1920,height:1040}},left={id:2,workArea:{x:-2560,y:0,width:2560,height:1400}};
+test('restores a remembered monitor and fullscreen state, including negative coordinates',()=>{assert.deepEqual(resolveVisualizerState({displayId:2,bounds:{x:-2200,y:100,width:1100,height:720},workArea:left.workArea,fullscreen:true},[main,left],main),{bounds:{x:-2200,y:100,width:1100,height:720},fullscreen:true});});
+test('repositions saved bounds when a monitor moves and clamps to a changed work area',()=>{const moved={id:2,workArea:{x:1920,y:0,width:1280,height:900}};const result=resolveVisualizerState({displayId:2,bounds:{x:-2200,y:100,width:1800,height:1200},workArea:left.workArea},[main,moved],main);assert.deepEqual(result.bounds,{x:1920,y:0,width:1280,height:900});});
+test('disconnected monitors and malformed bounds fall back onto a visible display',()=>{for(const saved of [{displayId:9,bounds:{x:9000,y:9000,width:800,height:600},fullscreen:true},{displayId:1,bounds:{x:NaN,y:0,width:Infinity,height:-5}},null]){const {bounds}=resolveVisualizerState(saved,[main],main);assert.ok(bounds.x>=0&&bounds.y>=0&&bounds.x+bounds.width<=1920&&bounds.y+bounds.height<=1040);}});
