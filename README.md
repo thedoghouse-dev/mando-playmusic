@@ -6,8 +6,8 @@ A standalone local music player with MilkDrop-compatible visualizations, powered
 
 Builds are generated locally in `release/`; installers and other build outputs are excluded from Git:
 
-- **Mando-Play-Music-0.8.3-Setup.exe** — installs for your Windows user, with Start menu and desktop shortcuts. Includes an uninstaller and a choice of installation folder.
-- **Mando-Play-Music-0.8.3-Portable.exe** — double-click to run without installing. Keep this executable wherever you like.
+- **Mando-Play-Music-0.8.6-Setup.exe** — installs for your Windows user, with Start menu and desktop shortcuts. Includes an uninstaller and a choice of installation folder.
+- **Mando-Play-Music-0.8.6-Portable.exe** — double-click to run without installing. Keep this executable wherever you like.
 
 Requires 64-bit Windows 10 or later. The release is unsigned; Windows may show an unknown-publisher prompt.
 
@@ -25,9 +25,9 @@ Favorites, volume, and the saved folder are stored in your Windows app-data prof
 - Media keys for play/pause and previous/next track while the app is focused.
 - Locally generated sound & visual demo, with no external audio needed.
 - Music streams from disk, including byte-range requests for seeking; entire files are not copied into memory.
-- Fonts, application code, and visualizer presets are bundled. No runtime internet connection is required, and music is never uploaded.
+- Fonts, application code, and visualizer presets are bundled. Local playback works offline; optional cover searches require internet. Music is never uploaded.
 
-Track titles, artists, albums, and available durations are read from embedded music tags (including ID3, FLAC/Vorbis, and MP4 tags). Embedded front-cover artwork appears in the track list and now-playing panel. Each missing or blank tag falls back independently to `Artist - Title.ext` filenames and `Artist/Album/track.ext` folders. Untagged tracks retain a placeholder cover. Artwork is read locally; there is no online artwork lookup. Native artwork is loaded on demand and cached as bounded thumbnails. Corrupt tags do not prevent tracks from appearing. Files are read without modifying their tags. Supported extensions include MP3, FLAC, WAV, M4A, AAC, OGG, Opus, WebM and AIFF; actual playback depends on codec support. MilkDrop `.milk`, compatible converted JSON, and ZIP preset packs can be imported in Visualization Studio. Native Winamp DLL plug-ins are not supported.
+Track titles, artists, albums, and available durations are read from embedded music tags (including ID3, FLAC/Vorbis, and MP4 tags). Embedded front-cover artwork appears in the track list and now-playing panel. Each missing or blank tag falls back independently to `Artist - Title.ext` filenames and `Artist/Album/track.ext` folders. When embedded artwork is missing or unreadable, the Windows app checks the song’s own folder for `folder.jpg`, `cover.jpg`, then `front.png` (case-insensitive). Invalid images are skipped. Albums without any usable artwork retain a placeholder cover. After adding or changing a cover image, use File → Rescan music folder (F5). For missing artwork, open an album and choose **Find cover art**. Enter an artist and album, search, select a result to preview it, then choose **Use this cover**. Search uses [MusicBrainz](https://musicbrainz.org/doc/MusicBrainz_API) and images come from the [Cover Art Archive](https://musicbrainz.org/doc/Cover_Art_Archive/API). **Find missing covers** in Albums checks the entire library, skips albums with any usable artwork, and downloads a single exact artist/album match for each missing cover. Progress, results, and Stop are available. Ambiguous matches are skipped for manual search; service search failures pause the run. Run again to retry remaining albums. Requests are spaced to respect the provider’s rate limit. Downloaded covers are saved in Mando’s Windows profile and follow embedded and folder artwork in priority. Music files and existing folder images are unchanged. Online lookup is optional; only entered artist/album text is sent when you search. Native artwork is loaded on demand and cached as bounded thumbnails. Corrupt tags do not prevent tracks from appearing. Files are read without modifying their tags. Supported extensions include MP3, FLAC, WAV, M4A, AAC, OGG, Opus, WebM and AIFF; actual playback depends on codec support. MilkDrop `.milk`, compatible converted JSON, and ZIP preset packs can be imported in Visualization Studio. Native Winamp DLL plug-ins are not supported.
 
 ## Changelog
 

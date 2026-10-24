@@ -5,8 +5,29 @@ versions before this repository's initial commit do not have separate Git commit
 
 ## Unreleased
 
-Record changes made after 0.8.3 here. When publishing a release, move its entries
+Record changes made after 0.8.6 here. When publishing a release, move its entries
 under a heading matching the version in package.json.
+
+## 0.8.6
+
+### Added
+
+- Find missing covers checks the entire library and downloads exact artist/album matches in one run, skipping all existing artwork.
+- Bulk progress, results, stop/retry, conservative matching, paced searches, and pause on search-service errors.
+
+## 0.8.5
+
+### Added
+
+- Find cover art in album details: search MusicBrainz, preview Cover Art Archive images, and save a selected cover locally in Mando.
+- Downloaded covers persist across restarts, refresh immediately, and are used after embedded and folder artwork. Searches are opt-in and send only the entered artist and album.
+
+## 0.8.4
+
+### Added
+
+- Windows album artwork falls back to folder.jpg, cover.jpg, then front.png in each song’s folder, with case-insensitive filenames.
+- Embedded artwork remains the first choice; corrupt images are skipped and rescanning refreshes cached covers.
 
 ## 0.8.3
 

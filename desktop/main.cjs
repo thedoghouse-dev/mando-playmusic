@@ -19,23 +19,10 @@ const contentTypes = { '.mp3':'audio/mpeg','.wav':'audio/wav','.ogg':'audio/ogg'
 async function main() {
   const { scanFolder, parseRange } = await import('./library.mjs');
   const { parseFile, selectCover } = await import('music-metadata');
-  const artworkCache = new Map();
-  async function artwork(file) {
-    if (artworkCache.has(file)) return artworkCache.get(file);
-    const task = (async () => {
-      try {
-        const cover = selectCover((await parseFile(file,{duration:false})).common.picture);
-        if (!cover?.data?.length || cover.data.length > 20 * 1024 * 1024) return null;
-        const image = nativeImage.createFromBuffer(Buffer.from(cover.data));
-        if (image.isEmpty()) return null;
-        const size=image.getSize(), scale=Math.min(1,512/Math.max(size.width,size.height));
-        return image.resize({width:Math.max(1,Math.round(size.width*scale)),height:Math.max(1,Math.round(size.height*scale)),quality:'good'}).toPNG();
-      } catch { return null; }
-    })();
-    artworkCache.set(file,task);
-    while(artworkCache.size>48) artworkCache.delete(artworkCache.keys().next().value);
-    return task;
-  }
+  const { createArtworkLoader } = await import('./artwork.mjs');
+  const { createCoverService } = await import('./cover-downloads.mjs');
+  const coverService=createCoverService({directory:path.join(app.getPath('userData'),'downloaded-covers'),nativeImage,version:app.getVersion()});
+  const artwork = createArtworkLoader({parseFile,selectCover,nativeImage,downloaded:coverService.read});
   const visualStatePath=path.join(app.getPath('userData'),'visualizer-window.json');
   let savedVisualState;try{savedVisualState=JSON.parse(fs.readFileSync(visualStatePath,'utf8'));}catch{}
   function writeVisualState(state){savedVisualState=state;try{fs.mkdirSync(path.dirname(visualStatePath),{recursive:true});fs.writeFileSync(visualStatePath+'.tmp',JSON.stringify(state));fs.renameSync(visualStatePath+'.tmp',visualStatePath);}catch(error){console.error('Could not save visualizer window:',error.message);}}
@@ -50,7 +37,7 @@ async function main() {
   async function savedFolder() { try { const settings = JSON.parse(await fsp.readFile(settingsPath,'utf8')); return typeof settings.folder === 'string' ? settings.folder : null; } catch { return null; } }
   async function importFolder(root) {
     const result = await scanFolder(root);
-    artworkCache.clear();
+    artwork.clear();
     // Keep previous tokens valid until the renderer has stopped its previous track.
     for (const [token,file] of result.allowed) allowedFiles.set(token,file);
     if (allowedFiles.size > result.allowed.size * 2 + 1000) allowedFiles = result.allowed;
@@ -70,6 +57,25 @@ async function main() {
     });
   });
   ipcMain.handle('library:restore', async event => { trusted(event); return serialize(async () => { const root = await savedFolder(); return root ? importFolder(root) : null; }); });
+  function coverFiles(urls){
+    if(!Array.isArray(urls)||!urls.length||urls.length>2000)throw Error('Choose an available album.');
+    const files=urls.map(value=>{const url=new URL(value);if(url.protocol!=='mando:'||url.hostname!=='music')throw Error('Invalid track.');const file=allowedFiles.get(url.pathname.slice(1));if(!file)throw Error('The album is no longer available.');return file;});
+    return files;
+  }
+  ipcMain.handle('covers:has-artwork',async(event,urls)=>{
+    trusted(event);
+    for(const file of coverFiles(urls))if(await artwork(file))return true;
+    return false;
+  });
+  let coverSaving=false;
+  ipcMain.handle('covers:search',async(event,artist,album)=>{trusted(event);return coverService.search(artist,album);});
+  ipcMain.handle('covers:preview',async(event,id)=>{trusted(event);const bytes=await coverService.preview(id);return 'data:image/png;base64,'+bytes.toString('base64');});
+  ipcMain.handle('covers:save',async(event,id,urls)=>{
+    trusted(event);
+    if(coverSaving)throw Error('A cover is already being saved.');
+    const files=coverFiles(urls);
+    coverSaving=true;try{await coverService.save(id,files);artwork.clear();return true;}finally{coverSaving=false;}
+  });
   function trustedOutput(event){if(event.sender!==visualWindow?.webContents||event.senderFrame!==event.sender.mainFrame||event.senderFrame?.url!=='mando://app/visualizer-window.html')throw Error('Unauthorized request');}
   function toggleOutputFullscreen(){if(visualWindow&&!visualWindow.isDestroyed())visualWindow.setFullScreen(!visualWindow.isFullScreen());}
   ipcMain.handle('visualizer:restore',event=>{trusted(event);return savedVisualState?.open===true;});

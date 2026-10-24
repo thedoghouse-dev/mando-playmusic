@@ -1,6 +1,6 @@
 {
   "name": "mandomusic",
-  "version": "0.8.3",
+  "version": "0.8.6",
   "private": true,
   "type": "module",
   "scripts": {
@@ -10,7 +10,7 @@
     "test": "node --test tests/*.test.js",
     "desktop": "npm run build && electron .",
     "dist:win": "npm run build && electron --version && electron-builder --win --x64",
-    "test:desktop": "npm run build && node scripts/test-desktop.mjs && node scripts/test-playlists-desktop.mjs && node scripts/test-visuals-desktop.mjs && node scripts/test-visualizer-window.mjs && node scripts/test-window-restore.mjs && node scripts/test-genre-desktop.mjs && node scripts/test-genre-filter-desktop.mjs",
+    "test:desktop": "npm run build && node scripts/test-desktop.mjs && node scripts/test-playlists-desktop.mjs && node scripts/test-visuals-desktop.mjs && node scripts/test-visualizer-window.mjs && node scripts/test-window-restore.mjs && node scripts/test-genre-desktop.mjs && node scripts/test-genre-filter-desktop.mjs && node scripts/test-artwork-desktop.mjs && node scripts/test-cover-download-desktop.mjs && node scripts/test-bulk-covers-desktop.mjs",
     "test:packaged": "node scripts/test-packaged.mjs"
   },
   "devDependencies": {
@@ -27,7 +27,7 @@
     "vite": "^7.1.0"
   },
   "main": "desktop/main.cjs",
-  "description": "Mando Play Music — a local music player with MilkDrop visualizations",
+  "description": "Mando Play Music \u2014 a local music player with MilkDrop visualizations",
   "author": "Mando",
   "build": {
     "appId": "com.mandomusic.player",

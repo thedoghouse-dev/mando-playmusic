@@ -1,3 +1,5 @@
+import { showBulkCoverSearch } from './bulk-covers.js';
+import { showCoverSearch } from './cover-search.js';
 import {genreOptions,filterByGenre,matchesGenre} from '../shared/genres.js';
 import {VisualizerOutput} from './visuals/output.js';
 import {VisualizationManager,managerMarkup} from './visuals/manager.js';
@@ -51,6 +53,7 @@ document.querySelector('#app').innerHTML = `
   </section>
   <section class="library-section"><div class="library-toolbar"><div class="library-tabs"><button class="tab active" id="tab-tracks">Tracks <span id="track-count">0</span></button><button class="tab" id="tab-albums">Albums <span id="album-tab-count">0</span></button><span id="library-caption">Your personal rotation</span></div><label class="search">${icon('search')}<input id="search" type="search" placeholder="Search your music" aria-label="Search your music"><kbd>/</kbd></label><select id="sort" aria-label="Sort tracks"><option value="title">Title A–Z</option><option value="artist">Artist A–Z</option><option value="album">Album A–Z</option><option value="genre">Genre A–Z</option></select></div>
 <div id="genre-bar" class="genre-bar"><label for="genre-filter">Genre<select id="genre-filter" aria-label="Filter by genre"><option value="">All genres</option></select></label><span id="genre-match-count" role="status" aria-live="polite"></span><div id="genre-actions" class="genre-actions" hidden><button id="play-genre" class="primary">${icon('play')} Play genre</button><button id="shuffle-genre" class="secondary">${icon('shuffle')} Shuffle genre</button><button id="clear-genre" class="text-button">Clear filter</button></div></div>
+    <div class="bulk-cover-actions" id="bulk-cover-actions" hidden><button class="secondary" id="find-missing-covers">Find missing covers</button></div>
     <div id="playlist-panel" hidden></div>
     <div id="album-detail" class="album-detail" hidden></div><div id="album-grid" class="album-grid" hidden></div>
     <div class="table-head" id="table-head"><span>#</span><span>TITLE</span><span>ALBUM</span><span id="track-category-heading">FORMAT</span><span>${icon('clock-3')}</span><span></span><span></span></div>
@@ -79,6 +82,7 @@ $('popout-visualizer').hidden=!window.mandoDesktop?.openVisualizer;$('popout-vis
 state.auto=visualManager.settings.auto;$('auto').classList.toggle('active',state.auto);$('auto').setAttribute('aria-pressed',state.auto);
 function refreshIcons() { createIcons({ icons }); }
 refreshIcons();
+$('find-missing-covers').onclick=()=>showBulkCoverSearch(groupAlbums(state.tracks.filter(track=>track.url?.startsWith('mando://music/'))),album=>{for(const track of album.tracks){if(track.artworkUrl)track.artworkUrl=track.artworkUrl.split('?')[0]+'?cover='+Date.now();}renderLibrary();updateNow();});
 let toastTimer;
 function toast(message) { $('toast').textContent = message; $('toast').classList.add('visible'); clearTimeout(toastTimer); toastTimer = setTimeout(() => $('toast').classList.remove('visible'), 5500); }
 function safeText(text) { return String(text).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
@@ -108,6 +112,8 @@ function genreResults(queue){state.genreResults=queue;$('genre-match-count').tex
 function setShuffle(enabled){state.shuffle=enabled;$('shuffle').classList.toggle('active',enabled);$('shuffle').setAttribute('aria-pressed',enabled);}
 async function playGenreResults(shuffle){const queue=state.genreResults;if(!queue.length){toast('No songs match this genre and search.');return;}setShuffle(shuffle);const track=queue[shuffle?Math.floor(Math.random()*queue.length):0];await playTrack(state.tracks.indexOf(track),queue);}
 function renderLibrary() {
+  $('bulk-cover-actions').hidden=state.view!=='albums'||!window.mandoDesktop?.hasAlbumArtwork;
+  $('find-missing-covers').disabled=!state.tracks.some(track=>track.url?.startsWith('mando://music/'));
   renderGenreFilter();
   renderPlaylistSidebar();
   $('playlist-panel').hidden=state.view!=='playlists';
@@ -378,10 +384,11 @@ function renderAlbumPanels(albums,shown,album,grid) {
   } else $('album-grid').replaceChildren();
   if(album) {
     const duration=album.tracks.reduce((sum,t)=>sum+(t.duration || 0),0);
-    $('album-detail').innerHTML=`<button class="album-back text-button" id="album-back">${icon('arrow-left')} All albums</button><div class="album-header"><div class="album-art album-large">${artworkMarkup(album,icon('disc-3'),false)}</div><div class="album-description"><div class="eyebrow">ALBUM</div><h2>${safeText(album.title)}</h2><p>${safeText(album.artist)}</p><small>${album.tracks.length} ${album.tracks.length===1?'song':'songs'}${duration ? ' · '+formatTime(duration) : ''}</small><button class="primary" id="play-album">${icon('play')} Play album</button><button class="secondary add-album-playlist" id="add-album-playlist">${icon('list-plus')} Add album to playlist</button></div></div>`;
+    $('album-detail').innerHTML=`<button class="album-back text-button" id="album-back">${icon('arrow-left')} All albums</button><div class="album-header"><div class="album-art album-large">${artworkMarkup(album,icon('disc-3'),false)}</div><div class="album-description"><div class="eyebrow">ALBUM</div><h2>${safeText(album.title)}</h2><p>${safeText(album.artist)}</p><small>${album.tracks.length} ${album.tracks.length===1?'song':'songs'}${duration ? ' · '+formatTime(duration) : ''}</small><button class="primary" id="play-album">${icon('play')} Play album</button><button class="secondary add-album-playlist" id="add-album-playlist">${icon('list-plus')} Add album to playlist</button>${window.mandoDesktop?.searchCovers&&album.tracks.every(track=>track.url?.startsWith('mando://music/'))?'<button class="secondary" id="find-cover">Find cover art</button>':''}</div></div>`;
     $('album-back').onclick=()=>{state.albumId=null;state.query=state.albumSearch;$('search').value=state.query;$('breadcrumb').textContent='Albums';renderLibrary();};
     $('add-album-playlist').onclick=()=>showPlaylistDialog('add',album.tracks);
     $('play-album').onclick=()=>playTrack(state.tracks.indexOf(album.tracks[0]),album.tracks);
+    if($('find-cover'))$('find-cover').onclick=()=>showCoverSearch(album,()=>{for(const track of album.tracks){if(track.artworkUrl)track.artworkUrl=track.artworkUrl.split('?')[0]+'?cover='+Date.now();}renderLibrary();updateNow();toast('Cover saved on this computer.');});
     handleArtworkErrors($('album-detail'));
   } else $('album-detail').replaceChildren();
 }

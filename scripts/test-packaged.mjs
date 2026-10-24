@@ -18,3 +18,9 @@ await import('./test-window-restore.mjs');
 await import('./test-genre-desktop.mjs');
 
 await import('./test-genre-filter-desktop.mjs');
+
+await import('./test-artwork-desktop.mjs');
+
+await import('./test-cover-download-desktop.mjs');
+
+await import('./test-bulk-covers-desktop.mjs');
