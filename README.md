@@ -1,4 +1,4 @@
-# Mando for Windows
+# Mando Play Music for Windows
 
 A standalone local music player with MilkDrop-compatible visualizations, powered by Electron and Butterchurn. No browser, Node.js installation, or development server is needed to use a release build.
 
@@ -6,8 +6,8 @@ A standalone local music player with MilkDrop-compatible visualizations, powered
 
 Builds are generated locally in `release/`; installers and other build outputs are excluded from Git:
 
-- **Mando-0.8.0-Setup.exe** — installs for your Windows user, with Start menu and desktop shortcuts. Includes an uninstaller and a choice of installation folder.
-- **Mando-0.8.0-Portable.exe** — double-click to run without installing. Keep this executable wherever you like.
+- **Mando-Play-Music-0.8.3-Setup.exe** — installs for your Windows user, with Start menu and desktop shortcuts. Includes an uninstaller and a choice of installation folder.
+- **Mando-Play-Music-0.8.3-Portable.exe** — double-click to run without installing. Keep this executable wherever you like.
 
 Requires 64-bit Windows 10 or later. The release is unsigned; Windows may show an unknown-publisher prompt.
 

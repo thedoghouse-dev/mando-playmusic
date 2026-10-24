@@ -5,8 +5,34 @@ versions before this repository's initial commit do not have separate Git commit
 
 ## Unreleased
 
-Record changes made after 0.8.0 here. When publishing a release, move its entries
+Record changes made after 0.8.3 here. When publishing a release, move its entries
 under a heading matching the version in package.json.
+
+## 0.8.3
+
+### Changed
+
+- Moved play music closer to mando. and distributed its letters across the full wordmark width, including the period.
+- Subtitle alignment adjusts automatically with the wordmark size.
+
+## 0.8.2
+
+### Changed
+
+- Restored the lowercase mando. wordmark and its green period.
+- Lowercased play music and tightened the gap beneath the wordmark from 6 to 2 pixels.
+
+## 0.8.1
+
+### Changed
+
+- App branding now reads Mando Play Music, with a large Mando wordmark and a smaller Play Music subtitle.
+- Windows titles, About dialog, installer identity, and shortcuts use the full app name.
+- Icon generation now resolves its output paths relative to the project after relocation.
+
+### Fixed
+
+- Corrected dependency lockfile version metadata to match the already-resolved package.
 
 ## 0.8.0
 

@@ -1,3 +1,6 @@
+$iconDirectory = Join-Path (Split-Path -Parent $PSScriptRoot) 'build'
+$pngPath = Join-Path $iconDirectory 'icon.png'
+$icoPath = Join-Path $iconDirectory 'icon.ico'
 Add-Type -AssemblyName System.Drawing
 $bitmap = New-Object System.Drawing.Bitmap 256,256
 $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
@@ -11,9 +14,9 @@ $graphics.DrawLine($pen,91,80,91,176)
 $graphics.DrawLine($pen,128,56,128,200)
 $graphics.DrawLine($pen,165,92,165,164)
 $graphics.DrawLine($pen,201,111,201,145)
-$bitmap.Save('D:\dev\mandomusic\build\icon.png',[System.Drawing.Imaging.ImageFormat]::Png)
-$png = [System.IO.File]::ReadAllBytes('D:\dev\mandomusic\build\icon.png')
-$stream = [System.IO.File]::Create('D:\dev\mandomusic\build\icon.ico')
+$bitmap.Save($pngPath,[System.Drawing.Imaging.ImageFormat]::Png)
+$png = [System.IO.File]::ReadAllBytes($pngPath)
+$stream = [System.IO.File]::Create($icoPath)
 $writer = New-Object System.IO.BinaryWriter $stream
 $writer.Write([uint16]0); $writer.Write([uint16]1); $writer.Write([uint16]1)
 $writer.Write([byte]0); $writer.Write([byte]0); $writer.Write([byte]0); $writer.Write([byte]0)

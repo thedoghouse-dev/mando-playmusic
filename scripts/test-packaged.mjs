@@ -1,8 +1,9 @@
 import path from 'node:path';
 import fs from 'node:fs';
-const version=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8')).version;
-const versioned=[version+'-final',version].map(folder=>path.resolve('release',folder,'win-unpacked','Mando.exe')).find(file=>fs.existsSync(file));
-process.env.MANDO_TEST_EXECUTABLE ||= versioned||path.resolve('release/win-unpacked/Mando.exe');
+const metadata=JSON.parse(fs.readFileSync(new URL('../package.json',import.meta.url),'utf8'));
+const version=metadata.version,executable=(metadata.build.productName||metadata.name)+'.exe';
+const versioned=[version+'-final',version].map(folder=>path.resolve('release',folder,'win-unpacked',executable)).find(file=>fs.existsSync(file));
+process.env.MANDO_TEST_EXECUTABLE ||= versioned||path.resolve('release','win-unpacked',executable);
 await import('./test-desktop.mjs');
 
 await import('./test-playlists-desktop.mjs');

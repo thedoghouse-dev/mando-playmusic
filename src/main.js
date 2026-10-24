@@ -26,7 +26,7 @@ audio.preload = 'metadata';
 audio.volume = state.volume;
 document.querySelector('#app').innerHTML = `
 <aside class="sidebar">
-  <a class="brand" href="/" aria-label="Mando home"><span class="brand-mark">${icon('audio-lines')}</span>mando<span class="brand-dot">.</span></a>
+  <a class="brand" href="/" aria-label="Mando Play Music home"><span class="brand-mark">${icon('audio-lines')}</span><span class="brand-copy"><span class="brand-name">mando<span class="brand-dot">.</span></span><span class="brand-subtitle" aria-hidden="true"><span>p</span><span>l</span><span>a</span><span>y</span><span class="brand-word-gap"> </span><span>m</span><span>u</span><span>s</span><span>i</span><span>c</span></span></span></a>
   <div class="workspace-label">YOUR LISTENING SPACE</div>
   <nav aria-label="Music library">
     <button class="nav-item active" id="nav-all">${icon('library')}<span>All music</span><span class="nav-count" id="side-count">0</span></button>
@@ -168,7 +168,7 @@ function updateNow() {
   }
   $('now-artist').title = t ? `${t.artist} · ${t.album}` : '';
   $('now-title').textContent = demo ? 'Midnight signal' : t?.title || 'A little silence, for now.';
-  $('now-artist').textContent = demo ? 'Mando · synthesized demo' : t?.artist || 'Pick a track. Find your frequency.';
+  $('now-artist').textContent = demo ? 'Mando Play Music · synthesized demo' : t?.artist || 'Pick a track. Find your frequency.';
   $('quality').textContent = demo ? 'LIVE SYNTH' : t?.format || 'LOCAL AUDIO';
   $('now-favorite').disabled = !t || !!demo; $('now-favorite').classList.toggle('active', !!t && state.favorites.has(t.id));
   const playing = !!demo || !audio.paused;
@@ -327,7 +327,7 @@ async function loadNativeFolder(choose) {
   finally { state.importing=false; $('add-folder').disabled=false; }
 }
 if (window.mandoDesktop) {
-  document.title='Mando';
+  document.title='Mando Play Music';
   window.mandoDesktop.onCommand(command => {
     if(command==='open-folder') chooseFolder();
     else if(command==='rescan') loadNativeFolder(false);

@@ -79,7 +79,7 @@ async function main() {
     const current=screen.getDisplayMatching(window.getBounds()),displays=screen.getAllDisplays();
     const fallback=savedVisualState?screen.getPrimaryDisplay():displays.find(d=>d.id!==current.id)||current;
     const restored=resolveVisualizerState(savedVisualState,displays,fallback),bounds=restored.bounds;
-    outputClosing=false;const output=visualWindow=new BrowserWindow({...bounds,minWidth:400,minHeight:300,title:'Mando · Visualizer',backgroundColor:'#07100d',show:false,icon:path.join(__dirname,'../build/icon.png'),webPreferences:{preload:path.join(__dirname,'visualizer-preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true,backgroundThrottling:false}});
+    outputClosing=false;const output=visualWindow=new BrowserWindow({...bounds,minWidth:400,minHeight:300,title:'Mando Play Music · Visualizer',backgroundColor:'#07100d',show:false,icon:path.join(__dirname,'../build/icon.png'),webPreferences:{preload:path.join(__dirname,'visualizer-preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true,backgroundThrottling:false}});
     output.setMenu(null);output.webContents.setWindowOpenHandler(()=>({action:'deny'}));
     output.webContents.on('will-navigate',(event,url)=>{if(url!=='mando://app/visualizer-window.html')event.preventDefault();});
     output.webContents.on('before-input-event',(event,input)=>{if(input.type!=='keyDown'||input.control||input.alt||input.meta)return;const key=input.key.toLowerCase();if(key==='f'||key==='f11'){event.preventDefault();toggleOutputFullscreen();}else if(key==='escape'&&output.isFullScreen()){event.preventDefault();output.setFullScreen(false);}});
@@ -125,7 +125,7 @@ async function main() {
       return new Response(response.body,{status:response.status,headers});
     } catch { return new Response('File unavailable',{status:404}); }
   });
-  window = new BrowserWindow({ width:1320,height:940,minWidth:800,minHeight:600,title:'Mando',backgroundColor:'#101310',show:false,icon:path.join(__dirname,'../build/icon.png'),webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true,backgroundThrottling:false} });
+  window = new BrowserWindow({ width:1320,height:940,minWidth:800,minHeight:600,title:'Mando Play Music',backgroundColor:'#101310',show:false,icon:path.join(__dirname,'../build/icon.png'),webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true,backgroundThrottling:false} });
   window.webContents.setWindowOpenHandler(() => ({action:'deny'}));
   window.webContents.on('will-navigate', (event,url) => { if (url !== 'mando://app/index.html') event.preventDefault(); });
   window.webContents.session.setPermissionRequestHandler((contents,permission,callback) => callback(permission === 'fullscreen' && contents.getURL() === 'mando://app/index.html'));
@@ -134,12 +134,12 @@ async function main() {
     {label:'File',submenu:[{label:'Open music folder…',accelerator:'CmdOrCtrl+O',click:()=>command('open-folder')},{label:'Rescan music folder',accelerator:'F5',click:()=>command('rescan')},{type:'separator'},{role:'quit'}]},
     {label:'Playback',submenu:[{label:'Play / Pause',accelerator:'MediaPlayPause',click:()=>command('play')},{label:'Next track',accelerator:'MediaNextTrack',click:()=>command('next')},{label:'Previous track',accelerator:'MediaPreviousTrack',click:()=>command('previous')}]},
     {label:'View',submenu:[{label:'Open visualizer window',accelerator:'CmdOrCtrl+Shift+V',click:()=>command('popout-visualizer')},{label:'Fullscreen visualizer',accelerator:'F11',click:()=>command('fullscreen')},{role:'resetZoom'},{role:'zoomIn'},{role:'zoomOut'}]},
-    {label:'Help',submenu:[{label:'Keyboard shortcuts',click:()=>command('help')},{label:'About Mando',click:()=>dialog.showMessageBox(window,{type:'info',title:'Mando',message:`Mando ${app.getVersion()}`,detail:'Your music, in motion.\nLocal music playback and MilkDrop visuals powered by Butterchurn.'})}]}
+    {label:'Help',submenu:[{label:'Keyboard shortcuts',click:()=>command('help')},{label:'About Mando Play Music',click:()=>dialog.showMessageBox(window,{type:'info',title:'Mando Play Music',message:`Mando Play Music ${app.getVersion()}`,detail:'Your music, in motion.\nLocal music playback and MilkDrop visuals powered by Butterchurn.'})}]}
   ]));
   window.once('ready-to-show',()=>window.show());
   window.on('close',()=>{closingPlayer=true;clearTimeout(saveVisualTimer);persistOutput(true);});
   window.on('closed',()=>{window=null;if(visualWindow&&!visualWindow.isDestroyed())visualWindow.destroy();});
   await window.loadURL('mando://app/index.html');
 }
-if (singleInstance) app.whenReady().then(main).catch(error=>{dialog.showErrorBox('Mando could not start',error.message);app.quit();});
+if (singleInstance) app.whenReady().then(main).catch(error=>{dialog.showErrorBox('Mando Play Music could not start',error.message);app.quit();});
 app.on('window-all-closed',()=>app.quit());
